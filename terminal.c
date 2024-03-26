@@ -9,14 +9,14 @@
 pid_t childPID; // pid of child process
 
 // execute command
-void execute_command(char* command)
+void execute_command(char* command, char *arg)
 {
     printf(" Executing command: %s\n", command);
 
     pid_t pid = fork();
 
-    char* args[3] = { command, NULL, NULL };
-
+    char *args[3] = { command, arg, NULL };
+    
     if (pid == -1)
     {
         fprintf(stderr, "Error creating child process\n");
@@ -63,25 +63,37 @@ int main()
 
         if (strstr(input, "ls"))
         {
-            execute_command("ls");
+            char *arg = strtok(input, " ");
+            arg = strtok(NULL, " ");
+
+            execute_command("ls", arg);
         } 
         else if (strstr(input, "cat")) 
         {
-            execute_command("/bin/cat");
+            char *arg = strtok(input, " ");
+            arg = strtok(NULL, " ");
+
+            execute_command("cat", arg);
         } 
         else if (strstr(input, "nice")) 
         {
-            execute_command("/bin/nice");
+            // nice -n 19 gnome-software
+            char output[100];
+            memset(output, 0, sizeof(output));
+            strncpy(output, input + 5, strlen(input) - 5);
+
+            printf("%s", output);
+            execute_command("nice", output);
         } 
         else if (strstr(input, "killall")) 
         {
-            execute_command("/usr/bin/killall");
+            execute_command("/usr/bin/killall", "");
         } 
         else if (strstr(input, "browser")) 
         {
-            execute_command("/snap/bin/brave");
+            execute_command("/snap/bin/brave", "");
         } 
-        else if (strstr(input, "exit") == 0 || strstr(input, "quit") == 0) 
+        else if (strstr(input, "exit")|| strstr(input, "q")) 
         {
             printf("Program complete.\n");
             break;
