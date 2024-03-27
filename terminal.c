@@ -12,11 +12,9 @@ pid_t childPID; // pid of child process
 void execute_command(char* command, char *arg)
 {
     printf(" Executing command: %s\n", command);
-
+    printf(" Executing argument: %s\n", arg);
     pid_t pid = fork();
-
     char *args[3] = { command, arg, NULL };
-    
     if (pid == -1)
     {
         fprintf(stderr, "Error creating child process\n");
@@ -24,6 +22,7 @@ void execute_command(char* command, char *arg)
     }
     else if (pid == 0) // child process
     {
+        printf(" Child process: %s\n", args[1]);
         execvp(args[0], args);
         fprintf(stderr, "Error executing command\n");
         exit(1);
@@ -78,12 +77,10 @@ int main()
         else if (strstr(input, "nice")) 
         {
             // nice -n 19 gnome-software
-            char output[100];
-            memset(output, 0, sizeof(output));
-            strncpy(output, input + 5, strlen(input) - 5);
 
-            printf("%s", output);
-            execute_command("nice", output);
+            char *arg = strtok(input, " ");
+            arg = strtok(NULL, "\n");
+            execute_command("nice", arg);
         } 
         else if (strstr(input, "killall")) 
         {
